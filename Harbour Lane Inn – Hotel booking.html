@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harbour Lane Inn – Book a room</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏨</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef3f3;--surface:#fff;--ink:#14313a;--muted:#55707a;--line:#cfdcde;
+  --tide:#1f6f78;--tide-ink:#fff;--brass:#b9852b;--danger:#b3372f;--ok:#237a4b;
+  --serif:"Young Serif",Georgia,serif;--sans:"DM Sans",system-ui,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1d22;--surface:#162a31;--ink:#e6f0f1;--muted:#93aab1;--line:#29424a;
+  --tide:#4fb3bd;--tide-ink:#08191d;--brass:#e0aa55;--danger:#ef8a82;--ok:#6fd09b;}}
+:root[data-theme="dark"]{--bg:#0e1d22;--surface:#162a31;--ink:#e6f0f1;--muted:#93aab1;--line:#29424a;
+  --tide:#4fb3bd;--tide-ink:#08191d;--brass:#e0aa55;--danger:#ef8a82;--ok:#6fd09b;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans)}
+header{padding:28px 20px 8px;max-width:960px;margin:auto}
+h1{font:400 clamp(2rem,6vw,3.2rem)/1.1 var(--serif);margin:0 0 6px}
+header p{margin:0;color:var(--muted)}
+main{max-width:960px;margin:auto;padding:12px 20px 60px}
+.tabs{display:flex;gap:8px;margin:12px 0}
+.tabs button{background:none;border:1px solid var(--line);color:var(--ink);padding:8px 14px;border-radius:999px;font:inherit;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.search{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted);font-weight:500}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:44px;width:100%}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.msg{margin:14px 0;color:var(--muted)}
+.err{color:var(--danger);font-size:.9rem;min-height:1.2em;margin:6px 0 0}
+.room{display:grid;grid-template-columns:120px 1fr;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin:14px 0}
+.swatch{border-radius:10px;display:flex;align-items:flex-end;padding:10px;color:#fff;font:400 1.6rem/1 var(--serif);min-height:120px}
+.room h2{font:400 1.35rem/1.2 var(--serif);margin:0 0 4px}
+.room p{margin:0 0 8px;color:var(--muted);font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tags span{font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.price strong{font-size:1.3rem}
+.price small{color:var(--muted)}
+.left{color:var(--brass);font-size:.85rem;font-weight:700}
+.btn{background:var(--tide);color:var(--tide-ink);border:0;border-radius:10px;padding:11px 18px;font:700 1rem var(--sans);cursor:pointer;min-height:44px}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:none;color:var(--danger);border:1px solid var(--danger)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);padding:22px;width:min(460px,92vw)}
+dialog::backdrop{background:rgba(5,15,18,.6)}
+dialog h2{font:400 1.5rem var(--serif);margin:0 0 10px}
+.fields{display:grid;gap:12px;margin:14px 0}
+.sum{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.sum div{display:flex;justify-content:space-between;padding:2px 0}
+.sum .tot{font-weight:700;font-size:1.1rem;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.ref{font:400 1.8rem var(--serif);color:var(--ok);margin:6px 0}
+.bk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.bk h3{margin:0;font:400 1.15rem var(--serif)}
+.bk p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.hide{display:none}
+@media (max-width:520px){.room{grid-template-columns:1fr}.swatch{min-height:70px}}
+@media (prefers-reduced-motion:no-preference){dialog[open]{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:0}}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Harbour Lane Inn</h1>
+  <p>Twelve rooms above the old fish market. Pick your dates and book direct.</p>
+</header>
+<main>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-search" aria-selected="true">Find a room</button>
+    <button role="tab" id="t-mine" aria-selected="false">My bookings (<span id="count">0</span>)</button>
+  </div>
+
+  <section id="v-search">
+    <div class="search">
+      <label>Check-in<input type="date" id="cin"></label>
+      <label>Check-out<input type="date" id="cout"></label>
+      <label>Guests<select id="guests"></select></label>
+    </div>
+    <p class="err" id="dateErr" role="alert"></p>
+    <div id="rooms"></div>
+  </section>
+
+  <section id="v-mine" class="hide"><div id="mine"></div></section>
+</main>
+
+<dialog id="dlg">
+  <div id="dlgBody"></div>
+</dialog>
+
+<script>
+const ROOMS=[
+  {id:"std",name:"Harbour Single",price:95,cap:1,units:3,bed:"1 single bed",desc:"A quiet corner room with a desk and a view of the slipway.",perks:["Wi-Fi","Rain shower"],color:"#1f6f78"},
+  {id:"dbl",name:"Quay Double",price:140,cap:2,units:4,bed:"1 queen bed",desc:"Bright room facing the water, with a window seat.",perks:["Wi-Fi","Breakfast","Kettle"],color:"#3a5a8c"},
+  {id:"twn",name:"Netloft Twin",price:150,cap:2,units:2,bed:"2 single beds",desc:"Exposed beams and two proper reading lamps.",perks:["Wi-Fi","Breakfast","Desk"],color:"#7a5c2e"},
+  {id:"fam",name:"Lighthouse Family",price:230,cap:4,units:2,bed:"1 king + 2 bunks",desc:"Two connected rooms with space for everyone and a small kitchenette.",perks:["Wi-Fi","Kitchenette","Breakfast"],color:"#8a3f4f"},
+  {id:"ste",name:"Captain’s Suite",price:340,cap:3,units:1,bed:"1 king + sofa bed",desc:"Top-floor suite with a freestanding bath and a harbour-facing balcony.",perks:["Balcony","Bath","Breakfast"],color:"#4b3f72"}
+];
+const TAX=0.12, KEY="harbour-bookings-v1";
+const $=s=>document.querySelector(s);
+const money=n=>"$"+n.toFixed(2).replace(/\.00$/,"");
+let bookings=[];
+try{bookings=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){bookings=[]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(bookings))}catch(e){}}
+
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const addDays=(s,n)=>{const d=new Date(s+"T12:00");d.setDate(d.getDate()+n);return iso(d)};
+const nightsBetween=(a,b)=>Math.round((new Date(b+"T12:00")-new Date(a+"T12:00"))/864e5);
+const fmt=s=>new Date(s+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+
+const today=iso(new Date());
+$("#cin").min=today; $("#cin").value=addDays(today,7);
+$("#cout").value=addDays(today,9); $("#cout").min=addDays(today,1);
+$("#guests").innerHTML=[1,2,3,4].map(n=>`<option value="${n}"${n===2?" selected":""}>${n} guest${n>1?"s":""}</option>`).join("");
+
+function booked(roomId,a,b){
+  return bookings.filter(k=>k.roomId===roomId&&k.cin<b&&a<k.cout).length;
+}
+function render(){
+  const a=$("#cin").value,b=$("#cout").value,g=+$("#guests").value;
+  const err=$("#dateErr"); err.textContent="";
+  if(!a||!b){$("#rooms").innerHTML="";return}
+  const n=nightsBetween(a,b);
+  if(n<1){err.textContent="Check-out must be after check-in.";$("#rooms").innerHTML="";return}
+  if(n>30){err.textContent="Stays are limited to 30 nights.";$("#rooms").innerHTML="";return}
+  const list=ROOMS.filter(r=>r.cap>=g);
+  if(!list.length){$("#rooms").innerHTML='<p class="msg">No room sleeps that many guests.</p>';return}
+  $("#rooms").innerHTML=`<p class="msg">${n} night${n>1?"s":""}, ${fmt(a)} to ${fmt(b)}</p>`+list.map(r=>{
+    const left=r.units-booked(r.id,a,b);
+    return `<article class="room">
+      <div class="swatch" style="background:${r.color}" aria-hidden="true">${r.name.split(" ")[0]}</div>
+      <div>
+        <h2>${r.name}</h2>
+        <p>${r.desc}</p>
+        <div class="tags"><span>Sleeps ${r.cap}</span><span>${r.bed}</span>${r.perks.map(p=>`<span>${p}</span>`).join("")}</div>
+        <div class="foot">
+          <div class="price"><strong>${money(r.price)}</strong> <small>per night · ${money(r.price*n)} total</small>
+          ${left>0&&left<=2?`<div class="left">Only ${left} left for these dates</div>`:""}</div>
+          ${left>0?`<button class="btn" data-book="${r.id}">Book this room</button>`:`<button class="btn" disabled>Sold out</button>`}
+        </div>
+      </div></article>`}).join("");
+}
+["cin","cout","guests"].forEach(id=>$("#"+id).addEventListener("change",e=>{
+  if(id==="cin"){
+    const a=$("#cin").value; if(!a)return;
+    $("#cout").min=addDays(a,1);
+    if(!$("#cout").value||nightsBetween(a,$("#cout").value)<1)$("#cout").value=addDays(a,1);
+  }
+  render();
+}));
+$("#rooms").addEventListener("click",e=>{
+  const id=e.target.dataset.book; if(id)openBooking(id);
+});
+
+function openBooking(id){
+  const r=ROOMS.find(x=>x.id===id),a=$("#cin").value,b=$("#cout").value,g=+$("#guests").value;
+  const n=nightsBetween(a,b),sub=r.price*n,tax=sub*TAX,tot=sub+tax;
+  $("#dlgBody").innerHTML=`
+    <h2>${r.name}</h2>
+    <p class="msg" style="margin:0">${fmt(a)} to ${fmt(b)} · ${n} night${n>1?"s":""} · ${g} guest${g>1?"s":""}</p>
+    <div class="fields">
+      <label>Full name<input id="fn" autocomplete="name" required></label>
+      <label>Email<input id="fe" type="email" autocomplete="email" required></label>
+    </div>
+    <p class="err" id="fErr" role="alert"></p>
+    <div class="sum">
+      <div><span>${money(r.price)} × ${n} night${n>1?"s":""}</span><span>${money(sub)}</span></div>
+      <div><span>Taxes (12%)</span><span>${money(tax)}</span></div>
+      <div class="tot"><span>Total</span><span>${money(tot)}</span></div>
+    </div>
+    <div class="actions"><button class="btn ghost" id="cancelDlg">Cancel</button><button class="btn" id="confirm">Confirm booking</button></div>`;
+  $("#dlg").showModal(); $("#fn").focus();
+  $("#cancelDlg").onclick=()=>$("#dlg").close();
+  $("#confirm").onclick=()=>{
+    const name=$("#fn").value.trim(),email=$("#fe").value.trim();
+    if(name.length<2){$("#fErr").textContent="Enter your full name.";return}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){$("#fErr").textContent="Enter a valid email address.";return}
+    if(r.units-booked(r.id,a,b)<1){$("#fErr").textContent="This room was just taken for those dates. Close this and pick another.";return}
+    const ref="HL-"+Math.random().toString(36).slice(2,7).toUpperCase();
+    bookings.push({ref,roomId:r.id,room:r.name,cin:a,cout:b,guests:g,name,email,total:tot});
+    save(); updateCount();
+    $("#dlgBody").innerHTML=`<h2>Booking confirmed</h2>
+      <div class="ref">${ref}</div>
+      <p>${r.name}, ${fmt(a)} to ${fmt(b)}.<br>We sent a confirmation to ${email.replace(/</g,"&lt;")}.</p>
+      <div class="actions"><button class="btn ghost" id="viewMine">View my bookings</button><button class="btn" id="done">Done</button></div>`;
+    $("#done").onclick=()=>{$("#dlg").close();render()};
+    $("#viewMine").onclick=()=>{$("#dlg").close();show("mine")};
+  };
+}
+
+function renderMine(){
+  const el=$("#mine");
+  if(!bookings.length){el.innerHTML='<p class="msg">No bookings yet. Find a room to get started.</p>';return}
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  el.innerHTML=bookings.slice().reverse().map(k=>`<div class="bk">
+    <div><h3>${esc(k.room)} <small style="color:var(--muted);font-family:var(--sans)">${k.ref}</small></h3>
+    <p>${fmt(k.cin)} to ${fmt(k.cout)} · ${k.guests} guest${k.guests>1?"s":""} · ${money(k.total)}</p>
+    <p>${esc(k.name)}, ${esc(k.email)}</p></div>
+    <button class="btn danger" data-cancel="${k.ref}">Cancel booking</button></div>`).join("");
+}
+$("#mine").addEventListener("click",e=>{
+  const ref=e.target.dataset.cancel; if(!ref)return;
+  if(!confirm("Cancel booking "+ref+"?"))return;
+  bookings=bookings.filter(k=>k.ref!==ref); save(); updateCount(); renderMine();
+});
+function updateCount(){$("#count").textContent=bookings.length}
+function show(v){
+  const s=v==="search";
+  $("#v-search").classList.toggle("hide",!s);$("#v-mine").classList.toggle("hide",s);
+  $("#t-search").setAttribute("aria-selected",s);$("#t-mine").setAttribute("aria-selected",!s);
+  s?render():renderMine();
+}
+$("#t-search").onclick=()=>show("search");
+$("#t-mine").onclick=()=>show("mine");
+updateCount();render();
+</script>
+</body>
+</html>
